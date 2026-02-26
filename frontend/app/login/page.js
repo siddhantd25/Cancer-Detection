@@ -1,16 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '../../lib/api';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get('registered') === '1';
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (localStorage.getItem('token')) router.replace('/predict');
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +40,24 @@ export default function LoginPage() {
       alignItems: 'center', justifyContent: 'center', padding: '24px',
       position: 'relative', overflow: 'hidden',
     }}>
+      {/* ← Back to Home — fixed top-left */}
+      <Link href="/" style={{
+        position: 'fixed', top: '20px', left: '20px', zIndex: 10,
+        display: 'inline-flex', alignItems: 'center', gap: '6px',
+        fontSize: '13px', color: '#64748b', textDecoration: 'none',
+        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '8px', padding: '7px 12px',
+        backdropFilter: 'blur(8px)', transition: 'color 0.2s, background 0.2s',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.color = '#00d4ff'; e.currentTarget.style.background = 'rgba(0,212,255,0.08)'; }}
+      onMouseLeave={e => { e.currentTarget.style.color = '#64748b'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Home
+      </Link>
+
       {/* Background blobs */}
       <div style={{
         position: 'absolute', width: '500px', height: '500px', borderRadius: '50%',
@@ -52,18 +77,44 @@ export default function LoginPage() {
             <div style={{
               width: '48px', height: '48px', borderRadius: '12px',
               background: 'linear-gradient(135deg,#00d4ff,#7c3aed)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px',
-            }}>🔬</div>
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2a10 10 0 0 1 10 10" opacity="0.6"/>
+                <path d="M12 22a10 10 0 0 1-10-10" opacity="0.6"/>
+                <path d="M2 12a10 10 0 0 1 10-10" opacity="0.3"/>
+                <path d="M22 12a10 10 0 0 1-10 10" opacity="0.3"/>
+                <line x1="12" y1="2" x2="12" y2="5" strokeWidth="2"/>
+                <line x1="12" y1="19" x2="12" y2="22" strokeWidth="2"/>
+                <line x1="2" y1="12" x2="5" y2="12" strokeWidth="2"/>
+                <line x1="19" y1="12" x2="22" y2="12" strokeWidth="2"/>
+              </svg>
+            </div>
             <span style={{ fontSize: '22px', fontWeight: 800, color: 'white' }}>
               CancerDetect <span style={{ color: '#00d4ff' }}>AI</span>
             </span>
           </Link>
+
           <h1 style={{ fontSize: '28px', fontWeight: 800, marginTop: '32px', marginBottom: '8px' }}>Welcome back</h1>
           <p style={{ color: '#94a3b8', fontSize: '14px' }}>Sign in to your account to continue</p>
         </div>
 
         <div className="glass" style={{ padding: '36px' }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+            {justRegistered && (
+              <div style={{
+                padding: '12px 16px', borderRadius: '10px',
+                background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)',
+                color: '#86efac', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px',
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Account created successfully! Please sign in.
+              </div>
+            )}
 
             {error && (
               <div style={{
@@ -144,5 +195,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--navy)' }} />}>
+      <LoginForm />
+    </Suspense>
   );
 }

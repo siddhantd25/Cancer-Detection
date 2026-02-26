@@ -32,12 +32,18 @@ export default function Navbar() {
     router.push('/');
   };
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/predict', label: 'Predict' },
-    { href: '/history', label: 'History' },
+  const allNavLinks = [
+    { href: '/', label: 'Home', guestOnly: true },
+    { href: '/predict', label: 'Predict', authOnly: true },
+    { href: '/history', label: 'History', authOnly: true },
     { href: '/about', label: 'About' },
   ];
+
+  const navLinks = allNavLinks.filter(link => {
+    if (link.guestOnly && user) return false;   // hide Home when logged in
+    if (link.authOnly && !user) return false;   // hide Predict/History when logged out
+    return true;
+  });
 
   return (
     <nav
@@ -67,7 +73,7 @@ export default function Navbar() {
         }}
       >
         {/* Logo */}
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <Link href={user ? '/predict' : '/'} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div
             style={{
               width: '32px',
@@ -77,13 +83,22 @@ export default function Navbar() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '16px',
             }}
           >
-            🔬
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2a10 10 0 0 1 10 10" opacity="0.6"/>
+              <path d="M12 22a10 10 0 0 1-10-10" opacity="0.6"/>
+              <path d="M2 12a10 10 0 0 1 10-10" opacity="0.3"/>
+              <path d="M22 12a10 10 0 0 1-10 10" opacity="0.3"/>
+              <line x1="12" y1="2" x2="12" y2="5" strokeWidth="2"/>
+              <line x1="12" y1="19" x2="12" y2="22" strokeWidth="2"/>
+              <line x1="2" y1="12" x2="5" y2="12" strokeWidth="2"/>
+              <line x1="19" y1="12" x2="22" y2="12" strokeWidth="2"/>
+            </svg>
           </div>
           <span style={{ fontWeight: 700, fontSize: '17px', color: 'white' }}>
-            CancerDetect <span style={{ color: '#00d4ff' }}>AI</span>
+             <span style={{ color: '#00d4ff' }}>CancerDetect</span>
           </span>
         </Link>
 

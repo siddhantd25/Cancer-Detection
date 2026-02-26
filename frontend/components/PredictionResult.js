@@ -87,14 +87,14 @@ export default function PredictionResult({ result, onReset }) {
             About {prediction}
           </div>
           <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.6 }}>
-            {CANCER_INFO[prediction] || 'A type of cancer detected by our AI classification model.'}
+            {CANCER_INFO[prediction] || 'A type of cancer detected by our classification model.'}
           </p>
           <div style={{
             marginTop: '12px', padding: '10px', borderRadius: '8px',
             background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
           }}>
             <p style={{ fontSize: '11px', color: '#fca5a5', lineHeight: 1.5 }}>
-              ⚠️ For educational use only. Always consult a qualified medical professional.
+              ⚠️ For educational & Research purposes only. Always consult a qualified medical professional.
             </p>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function PredictionResult({ result, onReset }) {
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
             <XAxis
               type="number" domain={[0, 100]}
-              tick={{ fill: '#475569', fontSize: 11 }}
+              tick={{ fill: '#94a3b8', fontSize: 11 }}
               tickFormatter={(v) => `${v}%`}
               axisLine={false} tickLine={false}
             />
@@ -123,8 +123,10 @@ export default function PredictionResult({ result, onReset }) {
               formatter={(v) => [`${v}%`, 'Confidence']}
               contentStyle={{
                 background: '#111827', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px', color: '#f1f5f9', fontSize: '12px',
+                borderRadius: '8px', fontSize: '12px',
               }}
+              labelStyle={{ color: '#f1f5f9', fontWeight: 600, marginBottom: '4px' }}
+              itemStyle={{ color: '#00d4ff' }}
             />
             <Bar dataKey="confidence" radius={[0, 6, 6, 0]}>
               {chartData.map((_, i) => (
@@ -161,11 +163,6 @@ export default function PredictionResult({ result, onReset }) {
           ))}
         </div>
       </div>
-
-      {/* Try another */}
-      <button className="btn-outline" onClick={onReset} style={{ width: '100%', padding: '14px' }}>
-        🔄 Try Another Image
-      </button>
     </div>
   );
 }

@@ -21,7 +21,7 @@ load_dotenv()
 # ── App init ──────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="CancerDetect AI API",
+    title="CancerDetect API",
     description="Medical image cancer classification powered by MobileNetV3Large",
     version="1.0.0",
 )
@@ -32,6 +32,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
+        "http://localhost:3001",
         "https://*.vercel.app",
     ],
     allow_credentials=True,
@@ -57,7 +58,7 @@ async def shutdown():
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    return {"status": "ok", "message": "CancerDetect AI is running"}
+    return {"status": "ok", "message": "CancerDetect is running"}
 
 
 # ── Auth routes ───────────────────────────────────────────────────────────────
@@ -129,6 +130,78 @@ async def predict(
         "record_id": str(inserted.inserted_id),
         "timestamp": timestamp.isoformat() + "Z",
         "processing_time_ms": result["processing_time_ms"],
+    }
+
+
+# ── Batch predict route ───────────────────────────────────────────────────────
+
+from typing import List
+
+@app.post("/predict/batch", tags=["Prediction"])
+async def predict_batch(
+    files: List[UploadFile] = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    if len(files) < 1:
+        raise HTTPException(status_code=400, detail="At least 1 image is required")
+    if len(files) > 5:
+        raise HTTPException(status_code=400, detail="Maximum 5 images allowed per batch")
+
+    user_id = str(current_user["_id"])
+    db = get_db()
+    results = []
+
+    for idx, file in enumerate(files):
+        if not file.content_type.startswith("image/"):
+            results.append({
+                "index": idx,
+                "filename": file.filename,
+                "status": "error",
+                "error": "Not a valid image file",
+            })
+            continue
+
+        try:
+            file_bytes = await file.read()
+            image_url  = upload_image(file_bytes, user_id)
+            result     = run_prediction(file_bytes)
+            timestamp  = datetime.utcnow()
+
+            prediction_doc = {
+                "user_id": user_id,
+                "timestamp": timestamp,
+                "image_url": image_url,
+                "predicted_class": result["predicted_class"],
+                "confidence": result["confidence"],
+                "top_3": result["top_3"],
+                "processing_time_ms": result["processing_time_ms"],
+            }
+            inserted = await db.predictions.insert_one(prediction_doc)
+
+            results.append({
+                "index": idx,
+                "filename": file.filename,
+                "status": "success",
+                "prediction": result["predicted_class"],
+                "confidence": result["confidence"],
+                "top_3": result["top_3"],
+                "image_url": image_url,
+                "record_id": str(inserted.inserted_id),
+                "timestamp": timestamp.isoformat() + "Z",
+                "processing_time_ms": result["processing_time_ms"],
+            })
+        except Exception as e:
+            results.append({
+                "index": idx,
+                "filename": file.filename,
+                "status": "error",
+                "error": str(e),
+            })
+
+    return {
+        "total": len(files),
+        "successful": sum(1 for r in results if r["status"] == "success"),
+        "results": results,
     }
 
 

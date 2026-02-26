@@ -77,14 +77,25 @@ export default function HistoryPage() {
                 value={filterClass}
                 onChange={e => setFilterClass(e.target.value)}
                 style={{
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '10px', padding: '10px 16px', color: '#f1f5f9',
-                  fontSize: '14px', outline: 'none', cursor: 'pointer',
+                  background: '#111827',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '10px',
+                  padding: '10px 16px',
+                  color: '#f1f5f9',
+                  fontSize: '14px',
+                  outline: 'none',
+                  cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif',
                 }}
               >
-                <option value="">All Cancer Types</option>
-                {CLASS_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
+                <option value="" style={{ background: '#111827', color: '#f1f5f9' }}>
+                  All Cancer Types
+                </option>
+                {CLASS_NAMES.map(c => (
+                  <option key={c} value={c} style={{ background: '#111827', color: '#f1f5f9' }}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -120,10 +131,30 @@ export default function HistoryPage() {
             {/* Selected result */}
             {selected && viewResult && (
               <div className="animate-fade-in">
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  Selected Result
+                <div style={{
+                  fontSize: '12px', color: '#94a3b8', marginBottom: '12px',
+                  textTransform: 'uppercase', letterSpacing: '0.08em',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <span>Selected Result</span>
+                  <button
+                    onClick={() => setSelected(null)}
+                    style={{
+                      background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '8px', width: '28px', height: '28px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', color: '#94a3b8', transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.color = '#ef4444'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#94a3b8'; }}
+                    aria-label="Close result"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
                 </div>
-                <PredictionResult result={viewResult} onReset={() => setSelected(null)} />
+                <PredictionResult result={viewResult} onReset={null} />
               </div>
             )}
           </div>
