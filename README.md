@@ -172,6 +172,7 @@ Render is an excellent platform for deploying FastAPI applications.
    * `CLOUDINARY_CLOUD_NAME`
    * `CLOUDINARY_API_KEY`
    * `CLOUDINARY_API_SECRET`
+   * `PYTHON_VERSION`: Set this to `3.10.13` *(Crucial: Render's default Python 3.14 does not support TensorFlow yet)*
 6. Click **Create Web Service**. Wait for the deployment to finish, and copy your live backend URL (e.g., `https://cancer-detect-api.onrender.com`).
 
 *Note: Since the `.keras` model file is inside the repository, ensure GitHub hasn't blocked it if it's over 100MB. If it is large, use Git LFS.*
