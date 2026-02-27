@@ -148,3 +148,63 @@ Cancer-Detection/
 4. **Batch Analysis (Optional):** Click the `Batch Upload` tab to select and process up to 5 images at once.
 5. **View Results:** Click "Analyse". The model will return the predicted cancer type, a confidence score, and a top-3 breakdown graph.
 6. **Review History:** Navigate to the "History" tab to review past analyses.
+
+---
+
+## 🌍 Deployment Guide
+
+This project is structured as a monorepo, meaning both the frontend and backend live in the same repository. Here is how to deploy them to production for free.
+
+### Part 1: Deploy Backend to Render (Free Tier)
+Render is an excellent platform for deploying FastAPI applications.
+
+1. **Push your code to GitHub** if you haven't already.
+2. Log into [Render](https://render.com/) and create a new **Web Service**.
+3. Connect your GitHub repository.
+4. Configure the Web Service with the following details:
+   * **Name:** `cancer-detect-api` (or similar)
+   * **Root Directory:** `backend`
+   * **Environment:** `Python 3`
+   * **Build Command:** `pip install -r requirements.txt`
+   * **Start Command:** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+5. **Environment Variables:** Scroll down to Advanced and add your `.env` variables:
+   * `MONGODB_URL`
+   * `JWT_SECRET`
+   * `JWT_ALGORITHM`
+   * `CLOUDINARY_CLOUD_NAME`
+   * `CLOUDINARY_API_KEY`
+   * `CLOUDINARY_API_SECRET`
+6. Click **Create Web Service**. Wait for the deployment to finish, and copy your live backend URL (e.g., `https://cancer-detect-api.onrender.com`).
+
+*Note: Since the `.keras` model file is inside the repository, ensure GitHub hasn't blocked it if it's over 100MB. If it is large, use Git LFS.*
+
+### Part 2: Deploy Frontend to Vercel (Free Tier)
+Vercel is the creator of Next.js and the best place to host it.
+
+1. Log into [Vercel](https://vercel.com/) and click **Add New** → **Project**.
+2. Import your connected GitHub repository.
+3. Configure the Project with the following details:
+   * **Project Name:** `cancer-detect` (or similar)
+   * **Framework Preset:** `Next.js`
+   * **Root Directory:** `frontend` (Click edit and select the `frontend` folder)
+4. **Environment Variables:** Expand the environment variables section and add:
+   * `NEXT_PUBLIC_API_URL`: Paste the live backend URL from Render (e.g., `https://cancer-detect-api.onrender.com`)
+5. Click **Deploy**. Vercel will build and launch your frontend.
+
+### Post-Deployment Checklist
+- **Update CORS:** Make sure your FastAPI backend allows requests from your new Vercel domain. In your `backend/main.py`, update `allow_origins`:
+  ```python
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=["http://localhost:3000", "http://localhost:3001", "https://your-vercel-domain.vercel.app"],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+  ```
+  *(Push this change and Render will automatically redeploy).*
+
+---
+
+## 📄 License
+This project is for educational and research purposes. © 2026 CancerDetect.

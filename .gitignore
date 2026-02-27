@@ -9,9 +9,6 @@ frontend/.next/
 frontend/node_modules/
 frontend/.env.local
 
-# Model file (too large for git)
-backend/*.keras
-
 # OS
 .DS_Store
 Thumbs.db
