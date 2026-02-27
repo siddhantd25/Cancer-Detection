@@ -41,12 +41,17 @@ app.add_middleware(
 )
 
 
+import asyncio
+
 # ── Lifecycle events ──────────────────────────────────────────────────────────
 
 @app.on_event("startup")
 async def startup():
     await connect_db()
-    load_cancer_model()   # Load model ONCE — not per request
+    # Run the sync model loader in a thread so it doesn't block uvicorn's
+    # event loop — this lets the port bind before model loading completes
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, load_cancer_model)
 
 
 @app.on_event("shutdown")
