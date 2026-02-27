@@ -9,6 +9,6 @@ passlib[bcrypt]
 bcrypt==4.0.1
 cloudinary
 pillow
-numpy
+numpy<2
 python-dotenv
 email-validator
