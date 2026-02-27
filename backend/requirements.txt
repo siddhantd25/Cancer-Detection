@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-tensorflow
+tflite-runtime
 python-multipart
 motor
 pymongo
