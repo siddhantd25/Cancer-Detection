@@ -2,8 +2,6 @@
 
 A full-stack, AI-powered web application for classifying medical images into 8 distinct cancer types. The app uses a deep learning model based on **MobileNetV3Large** to deliver fast, highly accurate predictions complete with confidence scores and top-3 ranked breakdowns.
 
-![CancerDetect AI Preview](https://via.placeholder.com/1200x630/0f172a/00d4ff?text=CancerDetect+AI)
-
 > **Disclaimer:** This project is for educational and research purposes only. It is not intended for clinical diagnosis. 
 
 ---
